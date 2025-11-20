@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Billions: Arcade Arena</title>
+<link rel="shortcut icon" href="./favicon.png" type="image/x-icon">
+<style>
+  :root{
+    --bg:#071226;
+    --card:#071a2b;
+    --muted:#9fb0c2;
+    --white:#e9f3f8;
+    --brand-1:#0024A8;
+    --brand-2:#0046FF;
+    --brand-3:#3F7BFF;
+    --accent-grad: linear-gradient(90deg,var(--brand-1) 0%, var(--brand-2) 50%, var(--brand-3) 100%);
+    --radius:14px;
+    --glass: rgba(255,255,255,0.02);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+
+  /* Page */
+  html,body{height:100%;margin:0;background: linear-gradient(180deg,#030718 0%, #071226 100%); color:var(--white); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+  .wrap{max-width:800px;margin:36px auto;padding:20px;box-sizing:border-box;}
+
+  header.top{
+    display:flex;
+    gap:18px;
+    align-items:center;
+    margin:40px 0;
+  }
+  .brand-logo{
+    width:64px;height:64px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-family:monospace;font-size:22px;box-shadow:0 10px 30px rgba(0,70,255,0.08), inset 0 -6px 18px rgba(0,0,0,0.18);
+  }
+  h1.page-title{color:#00BFFF;margin:0;font-size:24px;letter-spacing:0.2px}
+  p.lead{margin:4px 0 0 0;color:var(--muted);font-size:14px}
+
+  /* Grid */
+  .grid{
+    margin-top:18px;
+    display:flex;
+    flex-wrap: wrap;
+    gap:18px;
+  }
+
+  /* Card */
+  .card{
+    flex: 1 0 350px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+    border-radius:var(--radius);
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+    display:flex;
+    flex-direction:column;
+    min-height:360px;
+    transition: transform .16s ease, box-shadow .16s ease;
+  }
+
+
+  /* Image area */
+  .cover{
+    position:relative;
+    height:200px;
+    overflow:hidden;
+    background:#020a12;
+  }
+  .cover .img{
+    position:absolute;
+    inset:0;
+    background-position:center;
+    background-size:cover;
+    transition: transform .45s cubic-bezier(.2,.9,.15,1);
+    transform-origin:center center;
+    will-change:transform;
+  }
+  .card:hover .cover .img{ transform: scale(1.08); } /* subtle zoom on hover */
+
+  /* gradient title band over image */
+  .cover .band{
+    position:absolute;
+    left:12px; right:12px; bottom:12px;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; padding:8px 12px; border-radius:10px; backdrop-filter: blur(6px);
+    background: linear-gradient(90deg, rgba(0,0,0,0.45), rgba(0,0,0,0.28));
+    border:1px solid rgba(255,255,255,0.03);
+  }
+  .cover .title{
+    font-weight:800; font-size:20px; color:var(--white);
+    display:block;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom: 2px;
+  }
+  .cover .subtitle{ font-size:14px; color:var(--muted); font-weight:600; opacity:0.95; }
+
+  /* Body */
+  .body{ padding:14px 16px 18px; display:flex; flex-direction:column; gap:10px; flex:1; }
+  .desc{ color:var(--muted); font-size:13px; line-height:1.35; flex:1; }
+  .meta-row{ display:flex; align-items:center; gap:10px; margin-top:8px; justify-content:space-between; }
+  .tags{ display:flex; gap:8px; flex-wrap:wrap; }
+  .tag{ font-size:12px; color:var(--muted); padding:6px 8px; border-radius:8px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.02); }
+
+  .actions{margin-top:8px; }
+  .btn{ display: block; text-align: center;
+    outline: 2px solid #00BFFF44; color:white; padding:8px 12px; border-radius:10px; font-weight:800; border:none; cursor:pointer; text-decoration:none;
+    box-shadow: 0 8px 22px rgba(0,70,255,0.06);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn.secondary{ background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--white); font-weight:700; padding:7px 10px; }
+  .btn:hover{background:#00BFFF44;}
+
+  /* footer / credits */
+  .bottom-note{ margin-top:22px; color:var(--muted); font-size:13px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .brand-badge{ display:flex; gap:8px; align-items:center; color:var(--muted); font-weight:700; font-size:13px; }
+  .brand-badge .dot{ width:10px; height:10px; border-radius:3px; background:var(--brand-2); box-shadow:0 6px 18px rgba(0,70,255,0.12) }
+
+  /* responsive tweaks */
+  @media (max-width:720px){
+    .cover{ height:160px; }
+    .card{ min-height:320px; }
+    .wrap{ padding:12px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top" role="banner">
+      <div class="brand-logo" aria-hidden>
+      <svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 45 30" fill="none">
+  <path d="M29.6607 0C35.558 0 40.3386 4.78067 40.3386 10.6779V11.8811H42.4805C43.6567 11.8811 44.6102 12.8346 44.6102 14.0107C44.6102 15.1869 43.6567 16.1404 42.4805 16.1404H40.3386V20.0001C40.3386 24.4183 36.757 28 32.3387 28H12.2714C7.85323 27.9999 4.27157 24.4183 4.27152 20.0001V16.1404H2.12963C0.953468 16.1404 0 15.1869 0 14.0107C0 12.8346 0.953468 11.8811 2.12963 11.8811H4.27152V10.6779C4.27154 4.78068 9.0522 2.03349e-05 14.9494 0C17.8003 0 20.39 1.1174 22.3051 2.93787C24.2201 1.11738 26.8099 9.83029e-06 29.6607 0Z" fill="#0046FF"></path>
+  <path d="M10.916 10.6779C10.916 8.45008 12.7221 6.64404 14.9499 6.64404C17.1778 6.64404 18.9838 8.45008 18.9838 10.6779V18.6658C18.9838 20.1515 17.7794 21.3559 16.2937 21.3559H13.6061C12.1204 21.3559 10.916 20.1515 10.916 18.6658V10.6779Z" fill="black"></path>
+  <path d="M16.2937 19.5626V21.356H13.6061V19.5626H16.2937ZM17.1904 18.6659V10.678C17.1904 9.44066 16.1874 8.43747 14.95 8.43742C13.7126 8.43742 12.7094 9.44063 12.7094 10.678V18.6659C12.7094 19.1611 13.1109 19.5626 13.6061 19.5626V21.356L13.5367 21.3551C12.1062 21.3189 10.9531 20.1658 10.9169 18.7353L10.916 18.6659V10.678C10.916 8.45018 12.7222 6.64404 14.95 6.64404L15.054 6.64536C17.2338 6.70056 18.9838 8.48498 18.9838 10.678V18.6659L18.9829 18.7353C18.9467 20.1658 17.7937 21.3189 16.3631 21.3551L16.2937 21.356V19.5626C16.7889 19.5626 17.1904 19.1611 17.1904 18.6659Z" fill="white"></path>
+  <path d="M25.6279 10.6779C25.6279 8.45008 27.434 6.64404 29.6618 6.64404C31.8897 6.64404 33.6957 8.45008 33.6957 10.6779V18.6658C33.6957 20.1515 32.4913 21.3559 31.0057 21.3559H28.318C26.8323 21.3559 25.6279 20.1515 25.6279 18.6658V10.6779Z" fill="black"></path>
+  <path d="M31.0056 19.5626V21.356H28.318V19.5626H31.0056ZM31.9023 18.6659V10.678C31.9023 9.44066 30.8993 8.43747 29.6619 8.43742C28.4245 8.43742 27.4213 9.44063 27.4213 10.678V18.6659C27.4213 19.1611 27.8228 19.5626 28.318 19.5626V21.356L28.2486 21.3551C26.8181 21.3189 25.6651 20.1658 25.6288 18.7353L25.6279 18.6659V10.678C25.6279 8.45018 27.4341 6.64404 29.6619 6.64404L29.7659 6.64536C31.9457 6.70056 33.6957 8.48498 33.6957 10.678V18.6659L33.6948 18.7353C33.6586 20.1658 32.5056 21.3189 31.075 21.3551L31.0056 21.356V19.5626C31.5008 19.5626 31.9023 19.1611 31.9023 18.6659Z" fill="white"></path>
+</svg>
+      </div>
+      <div>
+        <h1 class="page-title">Billions: Arcade Arena</h1>
+        <p class="lead">A micro-arcade with chaotic quizzes, bullying bots & bragging rights</p>
+      </div>
+    </header>
+
+    <main class="grid" role="main" aria-live="polite">
+      <!-- Card 1 -->
+      <article class="card" aria-labelledby="g1-title">
+        <a class="cover" href="/brainburner.html" title="Play Billions Brainburner">
+          <div class="img" style="background-image:url('./brainBurner.png');"></div>
+          <div class="band">
+            <div>
+              <div class="title" id="g1-title">Billions: Brain Burner</div>
+              <div class="subtitle">Quick Quiz • Meme-ish</div>
+            </div>
+          </div>
+        </a>
+        <div class="body">
+          <p class="desc">A short, spicy quiz for true Billions believers. Insider lore, community easter eggs & just enough chaos to make Javi proud</p>
+          <div class="meta-row">
+            <div class="tags">
+              <span class="tag">10 Q</span>
+              <span class="tag">Trivia</span>
+              <span class="tag">Quiz</span>
+            </div>
+            <div style="opacity:0.95;color:var(--muted)">Est. 2 min</div>
+          </div>
+          <div class="actions" style="margin-top:8px">
+            <a class="btn play" href="./brainBurner.html" title="Play Brainburner">Play</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="card" aria-labelledby="g2-title">
+        <a class="cover" href="/blueguardian.html" title="Play Blue Guardian">
+          <div class="img" style="background-image:url('./blueGuardian.png');"></div>
+          <div class="band">
+            <div>
+              <div class="title" id="g2-title">Billions: Blue Guardian</div>
+              <div class="subtitle">Mascot vs Bots • Arcade</div>
+            </div>
+          </div>
+        </a>
+        <div class="body">
+          <p class="desc">Protect the network, bonk the bots. A fast mini-game with collectible bot types, explosions, and leaderboard flexing. Highly therapeutic.</p>
+          <div class="meta-row">
+            <div class="tags">
+              <span class="tag">2D</span>
+              <span class="tag">Action</span>
+              <span class="tag">Casual</span>
+            </div>
+            <div style="opacity:0.95;color:var(--muted)">Endless</div>
+          </div>
+          <div class="actions">
+            <a class="btn play" href="./blueGuardian.html" title="Play Blue Guardian">Play</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Add more cards as needed -->
+    </main>
+
+    <div class="bottom-note">
+      <div class="brand-badge"></div>
+      <div style="color:var(--muted)">💙 Made in collaboration between Human & AI</div>
+    </div>
+  </div>
+
+  <!-- optional tiny script: keyboard quick-jump for testing (press 1 or 2) -->
+  <script>
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === '1') window.location.href = '/brainburner.html';
+      if(e.key === '2') window.location.href = '/blueguardian.html';
+    });
+  </script>
+</body>
+</html>

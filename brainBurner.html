@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Billions: Brain Burner</title>
+<link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+<style>
+  :root{
+    --bg1:#071226;
+    --bg2:#071a2b;
+    --primary:#00BFFF44; /* Billions official primary color (solid) */
+    --card:#0f1b2a;
+    --muted:#9fb0c2;
+    --white:#e9f3f8;
+    --glass: rgba(255,255,255,0.02);
+    --radius:14px;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background: linear-gradient(180deg,var(--bg1), var(--bg2) 160%);
+    color:var(--white);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  .container{
+    width:100%;
+    max-width:920px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:var(--radius);
+    padding:22px;
+    box-shadow: 0 12px 40px rgba(3,8,18,0.7);
+    border: 1px solid rgba(255,255,255,0.03);
+  }
+
+  header{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:18px;
+  }
+  .logo{
+    width:64px;
+    height:64px;
+    border-radius:12px;
+    background: var(--primary);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    color:#ffffff;
+    box-shadow: 0 10px 30px rgba(0,70,255,0.06), inset 0 -6px 24px rgba(0,0,0,0.18);
+    font-family: monospace;
+    font-size:22px;
+  }
+  header h1{
+    font-size:20px;
+    margin:0;
+    line-height:1.05;
+  }
+  header p{margin:0;color:var(--muted);font-size:13px}
+
+  .card{
+    background: linear-gradient(180deg,var(--card), rgba(255,255,255,0.01));
+    border-radius:14px;
+    padding:18px;
+    margin-top:12px;
+  }
+
+  .meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .progress{
+    height:12px;
+    background:rgba(255,255,255,0.03);
+    border-radius:999px;
+    overflow:hidden;
+    flex:1;
+    margin-right:12px;
+  }
+  .progress > i{display:block;height:100%;background:var(--primary); width:0%}
+
+  .qtitle{
+    font-weight:700;
+    margin-bottom:10px;
+    font-size:18px;
+    color:var(--white);
+  }
+  .options{display:grid;gap:10px}
+  .option{
+    background:var(--glass);
+    border-radius:10px;
+    padding:12px 14px;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,0.02);
+    transition: all 120ms ease;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    outline:none;
+  }
+  .option:hover{transform:translateY(-3px); box-shadow: 0 10px 34px rgba(2,8,20,0.6)}
+  .option[aria-pressed="true"]{box-shadow: 0 10px 34px rgba(0,70,255,0.06); transform:translateY(-3px)}
+  .option .label{
+    display:block;
+    font-size:15px;
+    color:var(--white);
+  }
+  .option .badge{
+    min-width:36px;
+    height:36px;
+    border-radius:8px;
+    background:rgba(255,255,255,0.02);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--muted);
+    font-weight:800;
+  }
+
+  .controls-row{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-top:14px;
+  }
+
+  .btn{
+    outline: 2px solid var(--primary);
+    background: transparent;
+    color:#ffffff;
+    padding:10px 16px;
+    border-radius:10px;
+    font-size: 16px;
+    font-weight:700;
+    border:none;
+    cursor:pointer;
+    box-shadow: none;
+  }
+  .btn:hover {
+    background: var(--primary);
+  }
+
+
+  .btn.secondary{
+    background:transparent;
+    color:var(--white);
+    border:1px solid rgba(255,255,255,0.04);
+    padding:8px 12px;
+    font-weight:700;
+  }
+  .small{
+    font-size:16px; color:var(--muted);
+  }
+
+  .explain{
+    margin-top:12px;
+    color:var(--muted);
+    background: rgba(255,255,255,0.02);
+    padding:12px;
+    border-radius:10px;
+    font-size:14px;
+    line-height:1.4;
+  }
+
+  /* Result screen */
+  .result{
+    text-align:center;
+    padding:22px;
+  }
+  .score{
+    font-size:48px;
+    font-weight:800;
+    margin:10px 0;
+    color:var(--primary);
+  }
+  .feedback{color:var(--muted); margin-bottom:18px}
+
+  .start-screen{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+  }
+  input[type="text"]{
+    background: rgba(255,255,255,0.02);
+    color:var(--white);
+    border:1px solid rgba(255,255,255,0.02);
+    padding:10px 12px;
+    border-radius:10px;
+    min-width:220px;
+  }
+  .timer{
+    font-weight:700;
+    color:var(--primary);
+    font-size:16px;
+    min-width:72px;
+    text-align:center;
+  }
+
+  .leaderboard{
+    margin-top:12px;
+    background: rgba(255,255,255,0.01);
+    padding:12px;
+    border-radius:10px;
+    color:var(--muted);
+    font-size:14px;
+  }
+  .lb-row{display:flex;justify-content:space-between;padding:6px 0}
+  .lb-title{font-weight:700;color:var(--white);margin-bottom:6px}
+
+  footer{
+    margin-top:18px;
+    color:var(--muted);
+    font-size:13px;
+    display:flex;
+    justify-content:space-between;
+  }
+
+  @media (max-width:700px){
+    header h1{font-size:18px}
+    .qtitle{font-size:16px}
+  }
+</style>
+</head>
+<body>
+  <div class="container" role="main" aria-labelledby="title">
+    <header>
+      <svg xmlns="http://www.w3.org/2000/svg" width="45" height="28" viewBox="0 0 45 28" fill="none"><path d="M29.6607 0C35.558 0 40.3386 4.78067 40.3386 10.6779V11.8811H42.4805C43.6567 11.8811 44.6102 12.8346 44.6102 14.0107C44.6102 15.1869 43.6567 16.1404 42.4805 16.1404H40.3386V20.0001C40.3386 24.4183 36.757 28 32.3387 28H12.2714C7.85323 27.9999 4.27157 24.4183 4.27152 20.0001V16.1404H2.12963C0.953468 16.1404 0 15.1869 0 14.0107C0 12.8346 0.953468 11.8811 2.12963 11.8811H4.27152V10.6779C4.27154 4.78068 9.0522 2.03349e-05 14.9494 0C17.8003 0 20.39 1.1174 22.3051 2.93787C24.2201 1.11738 26.8099 9.83029e-06 29.6607 0Z" fill="#0046FF"></path><path d="M10.916 10.6779C10.916 8.45008 12.7221 6.64404 14.9499 6.64404C17.1778 6.64404 18.9838 8.45008 18.9838 10.6779V18.6658C18.9838 20.1515 17.7794 21.3559 16.2937 21.3559H13.6061C12.1204 21.3559 10.916 20.1515 10.916 18.6658V10.6779Z" fill="black"></path><path d="M16.2937 19.5626V21.356H13.6061V19.5626H16.2937ZM17.1904 18.6659V10.678C17.1904 9.44066 16.1874 8.43747 14.95 8.43742C13.7126 8.43742 12.7094 9.44063 12.7094 10.678V18.6659C12.7094 19.1611 13.1109 19.5626 13.6061 19.5626V21.356L13.5367 21.3551C12.1062 21.3189 10.9531 20.1658 10.9169 18.7353L10.916 18.6659V10.678C10.916 8.45018 12.7222 6.64404 14.95 6.64404L15.054 6.64536C17.2338 6.70056 18.9838 8.48498 18.9838 10.678V18.6659L18.9829 18.7353C18.9467 20.1658 17.7937 21.3189 16.3631 21.3551L16.2937 21.356V19.5626C16.7889 19.5626 17.1904 19.1611 17.1904 18.6659Z" fill="white"></path><path d="M25.6279 10.6779C25.6279 8.45008 27.434 6.64404 29.6618 6.64404C31.8897 6.64404 33.6957 8.45008 33.6957 10.6779V18.6658C33.6957 20.1515 32.4913 21.3559 31.0057 21.3559H28.318C26.8323 21.3559 25.6279 20.1515 25.6279 18.6658V10.6779Z" fill="black"></path><path d="M31.0056 19.5626V21.356H28.318V19.5626H31.0056ZM31.9023 18.6659V10.678C31.9023 9.44066 30.8993 8.43747 29.6619 8.43742C28.4245 8.43742 27.4213 9.44063 27.4213 10.678V18.6659C27.4213 19.1611 27.8228 19.5626 28.318 19.5626V21.356L28.2486 21.3551C26.8181 21.3189 25.6651 20.1658 25.6288 18.7353L25.6279 18.6659V10.678C25.6279 8.45018 27.4341 6.64404 29.6619 6.64404L29.7659 6.64536C31.9457 6.70056 33.6957 8.48498 33.6957 10.678V18.6659L33.6948 18.7353C33.6586 20.1658 32.5056 21.3189 31.075 21.3551L31.0056 21.356V19.5626C31.5008 19.5626 31.9023 19.1611 31.9023 18.6659Z" fill="white"></path></svg>
+      <div>
+        <h1 id="title" style="color:#00BFFF;">Billions: Brain Burner</h1>
+        <p>10 questions • 60s each</p>
+      </div>
+    </header>
+
+    <div class="card" id="quizCard">
+      <!-- START SCREEN (simplified) -->
+      <div id="startArea">
+        <div class="start-screen">
+          <div>
+            <div class="small">Enter a display name (optional)</div><br>
+            <input id="displayName" type="text" placeholder="Anonymous Billionaire" maxlength="30" />
+          </div>
+          <div style="margin-left:auto">
+            <button class="btn" id="startBtn">Start Quiz</button>
+          </div>
+        </div>
+
+        <div style="color:var(--muted); margin-top:6px; font-size:12px">
+          Tips: complete the quiz & share on X to flex
+        </div>
+      </div>
+
+      <!-- QUIZ AREA -->
+      <div id="questionArea" style="display:none">
+        <div class="meta">
+          <div style="display:flex;align-items:center;gap:12px;flex:1">
+            <div style="font-size:13px;color:var(--muted)">Question <strong id="qIndex">1</strong> / <span id="qTotal">10</span></div>
+            <div class="progress" aria-hidden><i id="progressBar"></i></div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="timer" id="timerDisplay">60s</div>
+            <div style="font-size:13px;color:var(--muted)"><span id="scoreMini">Score: 0</span></div>
+          </div>
+        </div>
+
+        <div id="questionBlock">
+          <div class="qtitle" id="qTitle">Loading…</div><br>
+          <div class="options" id="optionsList" role="list"></div><br>
+
+          <div class="controls-row">
+            <button class="btn secondary" id="skipBtn">Skip</button>
+            <button class="btn" id="nextBtn" disabled>Next</button>
+            <div style="margin-left:auto" class="small">Name: <strong id="playerName">Anonymous Billionaire</strong></div>
+          </div>
+
+          <div id="explainBox" class="explain" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- RESULT AREA -->
+      <div id="resultArea" style="display:none">
+        <div class="result">
+          <div style="font-size:14px;color:var(--muted)">Quiz completed</div>
+          <div class="score" id="finalScore">0 / 10</div>
+          <div class="feedback" id="finalFeedback">Nice work!</div>
+
+          <div style="display:flex;gap:10px;justify-content:center;margin-top:10px">
+            <button class="btn secondary" id="retakeBtn">Retake</button>
+            <button class="btn" id="shareBtnResult">Share on X</button>
+          </div>
+
+          <div style="height:16px"></div>
+
+          <div class="leaderboard" id="leaderboard" style="display:none">
+            <div class="lb-title">Top Scores</div>
+            <div id="lbRows"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      <div></div>
+      <div>💙 Made in collaboration between Human & AI</div>
+    </footer>
+  </div>
+
+<script>
+/*
+  Billions Quiz — updated:
+  - Final question uses Submit (saves to local leaderboard)
+  - Removed manual Save button; result has Retake + Share only
+*/
+
+/* ====== QUESTIONS: edit or expand this pool ====== */
+const questionsPool = [
+  {
+    q: 'What secret mission is Billions “Proof of Uniqueness” actually on?',
+    choices: [
+      'To guide your neighbour’s cat create 12 different dating profiles',
+      'To help fridge robots and highly-motivated toasters with WiFi pretent to be you',
+      'To guarantee the internet knows you’re a real person without asking for your blood sample',
+      'To create a digital world where humans are outnumbered 9:1 by bot families'
+    ],
+    answer: 2,
+    explain: 'Correct answer Option C'
+  },
+  {
+    q: 'What magical tech does Billions use to prove your uniqueness to the internet?',
+    choices: [
+      'By asking permissions for your Calender, Camera, Contacts, Microphone, SMS, Storage & Telephone',
+      'By asking you capthca’s like "1 + 1", "23 x 19" & "Solve Global warming in 3 seconds or less"',
+      'By uploading you address, your ID and that embracing selfie from 2014',
+      'By using Zero-Knowledge sorcery that is so private, even your reflection doesn’t know what happened'
+    ],
+    answer: 3,
+    explain: 'Correct answer Option D'
+  },
+  {
+    q: 'How big is the slice of the token pie that Billions hands to the community?',
+    choices: [
+      '0.0000001% - Exclusively for people who says \'gm\' before 3 am',
+      '32% - So generous that makes other projects rethink their life choices',
+      '-5% - You run nodes, invest time & money, we fill our pockets',
+      '0% - Money is evil. We believe in free labour'
+    ],
+    answer: 1,
+    explain: 'Correct answer Option B'
+  },
+  {
+    q: 'Which ticker you\'ll be staring at for your "Billionaire Arc" to begin?',
+    choices: [
+      'The Ticker is $BILL',
+      'The Ticker is $JAVI',
+      'The Ticker sounds like $BRRRR',
+      'The Ticker is $BELIKEBILLY'
+    ],
+    answer: 0,
+    explain: 'Correct answer Option A'
+  },
+  {
+    q: 'What is the total supply of Billions tokens?',
+    choices: [
+      'I tried but I could only count upto 1000',
+      '10M* (with an *). We\'ll increase it whenever we\'ll feel like it',
+      'A fixed 10B. No emotional fluctuations involved',
+      '10T. Someone forgot to release the 0 key'
+    ],
+    answer: 2,
+    explain: 'Correct answer Option C'
+  },
+  {
+    q: ' If Billions had another mascot, what would that be?',
+    choices: [
+      'A heroic ENS domain named not_a_bot.eth',
+      'JAVI in 32 bits screaming "BILLIONS IS INEVITABLE"',
+      'A floating QR code asking you "Please verify"',
+      'An Ghibli thief trying to steal your passport'
+    ],
+    answer: 1,
+    explain: 'Correct answer Option B'
+  },
+  {
+    q: 'There\'re discord roles that measures your humanity faster than a DNA test. Which one is one of them?',
+    choices: [
+      'Probably Human - Who hasn\'t completed their verification yet',
+      'Captcha Overlord - Defeated more captcha than an bot can count',
+      'Summoned One - Only appears when someone says "wen" in chat',
+      'Super OG - Has the bragging rights over every platform'
+    ],
+    answer: 3,
+    explain: 'Correct answer Option D'
+  },
+  {
+    q: 'What does the Billions logo actually look like according to users who say they’ve seen it in their dreams?',
+    choices: [
+      'Two rectangles that accidentally became famous after falling into a bucket of #0046FF paint',
+      'Just the alphabate B with eyes, but rotated and hoping nobody notices',
+      'A distorted batman mask that when put on gives you power to fight Superman',
+      'A hybrid of PEPE and CHILLGUY'
+    ],
+    answer: 1,
+    explain: 'Correct answer Option B'
+  },
+  {
+    q: 'Who\'s the "Realest Admin" in Billions community?',
+    choices: [
+      'A random bot who escaped Proof-of-Uniqueness and became sentient',
+      'Salesman 24/7',
+      'Satoshi Nakamura',
+      'Vitalik’s secret alt account dedicated to shilling'
+    ],
+    answer: 1,
+    explain: 'Correct answer Option B'
+  },
+  {
+    q: 'What best describes the Billions community vibe on an average day?',
+    choices: [
+      'Chaotic. Half building, half memeing & fully convinced Billions will outlive the bear market',
+      'A controlled explosion where everyone yells “gm” at unrelated times',
+      'A monastery of calm monks chanting Proof-of-Uniqueness verses',
+      'Scientifically classified as “cryptoverse gremlins who are too helpful to be dangerous.”'
+    ],
+    answer: 0,
+    explain: 'Correct answer Option A'
+  }
+];
+
+/* ====== App State ====== */
+let pool = [];
+let questions = []; // current session set
+let idx = 0;
+let score = 0;
+let answered = false;
+let timer = null;
+let timeLeft = 60;
+const SETTINGS = { numQ: 10, secondsPerQ: 60, name: 'Anonymous Billionaire' };
+
+/* ====== Elements ====== */
+const startArea = document.getElementById('startArea');
+const startBtn = document.getElementById('startBtn');
+const displayNameInput = document.getElementById('displayName');
+const qIndexEl = document.getElementById('qIndex');
+const qTotalEl = document.getElementById('qTotal');
+const qTitleEl = document.getElementById('qTitle');
+const optionsList = document.getElementById('optionsList');
+const nextBtn = document.getElementById('nextBtn');
+const skipBtn = document.getElementById('skipBtn');
+const explainBox = document.getElementById('explainBox');
+const progressBar = document.getElementById('progressBar');
+const scoreMini = document.getElementById('scoreMini');
+const questionArea = document.getElementById('questionArea');
+const resultArea = document.getElementById('resultArea');
+const finalScoreEl = document.getElementById('finalScore');
+const finalFeedback = document.getElementById('finalFeedback');
+const retakeBtn = document.getElementById('retakeBtn');
+const lbRows = document.getElementById('lbRows');
+const leaderboardEl = document.getElementById('leaderboard');
+const playerNameEl = document.getElementById('playerName');
+const timerDisplay = document.getElementById('timerDisplay');
+const shareBtnResult = document.getElementById('shareBtnResult');
+const quizLink = document.getElementById('quizLink');
+
+/* ====== Utilities ====== */
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+/* ====== Session flow ====== */
+startBtn.addEventListener('click', ()=>{
+  SETTINGS.name = displayNameInput.value.trim() || 'Anonymous Billionaire';
+  playerNameEl.textContent = SETTINGS.name;
+  initSession();
+});
+
+function initSession(){
+  pool = JSON.parse(JSON.stringify(questionsPool)); // copy
+  shuffle(pool);
+  const take = Math.min(SETTINGS.numQ, pool.length);
+  if(pool.length >= take) questions = pool.slice(0, take);
+  else {
+    questions = pool.slice();
+    while(questions.length < take) questions = questions.concat(shuffle(JSON.parse(JSON.stringify(questionsPool))));
+    questions = questions.slice(0, take);
+  }
+
+  idx = 0; score = 0; answered = false;
+  qTotalEl.textContent = questions.length;
+  scoreMini.textContent = `Score: ${score}`;
+  startArea.style.display = 'none';
+  questionArea.style.display = 'block';
+  resultArea.style.display = 'none';
+  loadQuestion(0);
+}
+
+function loadQuestion(n){
+  clearTimer();
+  const item = questions[n];
+  qIndexEl.textContent = (n+1);
+  qTitleEl.textContent = item.q;
+  optionsList.innerHTML = '';
+  explainBox.style.display = 'none';
+  nextBtn.disabled = true;
+  answered = false;
+  timeLeft = SETTINGS.secondsPerQ;
+  updateTimerDisplay();
+  item.choices.forEach((c,i)=>{
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.setAttribute('role','button');
+    div.tabIndex = 0;
+    div.dataset.index = i;
+    div.innerHTML = `
+      <div class="badge">${'ABCD'[i] || (i+1)}</div>
+      <div class="label">${c}</div>
+    `;
+    div.addEventListener('click', ()=> selectOption(div, n));
+    div.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); selectOption(div,n); }});
+    optionsList.appendChild(div);
+  });
+  // If this is the last question, show Submit instead of Next
+  if(n === questions.length - 1){
+    nextBtn.textContent = 'Submit';
+  } else {
+    nextBtn.textContent = 'Next';
+  }
+  updateProgress();
+  startTimer();
+}
+
+function selectOption(el, qn){
+  if(answered) return;
+  const selected = Number(el.dataset.index);
+  const correct = questions[qn].answer;
+  Array.from(optionsList.children).forEach((child, idxC)=>{
+    child.style.opacity = '0.6';
+    child.style.transform = 'none';
+    child.setAttribute('aria-pressed','false');
+  });
+  el.style.opacity = '1';
+  el.style.transform = 'translateY(-3px)';
+  el.setAttribute('aria-pressed','true');
+  explainBox.style.display = 'block';
+  const isRight = selected === correct;
+  if(isRight) {
+    score += 1;
+    explainBox.innerHTML = `✅ <strong>Correct.</strong>`;
+  } else {
+    explainBox.innerHTML = `❌ <strong>Incorrect.</strong> ${questions[qn].explain}`;
+  }
+  scoreMini.textContent = `Score: ${score}`;
+  // enable next/submit
+  nextBtn.disabled = false;
+  answered = true;
+  clearTimer();
+}
+
+/* Next/Submit handler */
+nextBtn.addEventListener('click', ()=>{
+  if(idx === questions.length - 1){
+    // Final question: Submit flow (auto-save then show result)
+    submitAndFinish();
+  } else {
+    moveNext();
+  }
+});
+
+skipBtn.addEventListener('click', ()=>{
+  if(!answered){
+    answered = true;
+    explainBox.style.display = 'block';
+    explainBox.innerHTML = `⏭️ <strong>Skipped.</strong> ${questions[idx].explain || ''}`;
+    nextBtn.disabled = false;
+    clearTimer();
+    return;
+  }
+  // if already answered, treat like pressing Next
+  if(idx === questions.length - 1){
+    submitAndFinish();
+  } else {
+    moveNext();
+  }
+});
+
+function moveNext(){
+  idx++;
+  if(idx >= questions.length) showResult(); else loadQuestion(idx);
+}
+function updateProgress(){
+  const pct = Math.round((idx / questions.length) * 100);
+  progressBar.style.width = pct + '%';
+}
+
+/* ====== Timer (fixed 60s) ====== */
+function startTimer(){
+  updateTimerDisplay();
+  timer = setInterval(()=>{
+    timeLeft -= 1;
+    if(timeLeft <= 0){
+      clearTimer();
+      if(!answered){
+        answered = true;
+        explainBox.style.display = 'block';
+        explainBox.innerHTML = `⌛ <strong>Time's up.</strong> ${questions[idx].explain || ''}`;
+        nextBtn.disabled = false;
+      }
+      return;
+    }
+    updateTimerDisplay();
+  }, 1000);
+}
+function updateTimerDisplay(){
+  timerDisplay.textContent = `${timeLeft}s`;
+  if(timeLeft <= 3) {
+    timerDisplay.style.color = 'red';
+  } else {
+    timerDisplay.style.color = 'var(--primary)';
+  }
+}
+function clearTimer(){ if(timer){ clearInterval(timer); timer=null; }}
+
+/* ====== Leaderboard (local) ====== */
+const LB_KEY = 'billions_quiz_lb';
+function getLeaderboard(){ try{ return JSON.parse(localStorage.getItem(LB_KEY)) || []; }catch(e){ return []; } }
+function saveToLeaderboard(name, scoreVal, total){
+  const rec = { name: name || 'Anonymous', score: scoreVal, total: total, ts: Date.now() };
+  const lb = getLeaderboard();
+  lb.push(rec);
+  lb.sort((a,b)=> (b.score - a.score) || (b.ts - a.ts));
+  localStorage.setItem(LB_KEY, JSON.stringify(lb.slice(0,50)));
+  return rec;
+}
+function loadLeaderboardDisplay(){
+  const lb = getLeaderboard();
+  if(!lb || lb.length === 0){ leaderboardEl.style.display = 'none'; return; }
+  leaderboardEl.style.display = 'block';
+  const top = lb.slice(0,5);
+  lbRows.innerHTML = '';
+  top.forEach((r, i)=>{
+    const row = document.createElement('div');
+    row.className = 'lb-row';
+    row.innerHTML = `<div style="color:var(--muted)">${i+1}. ${escapeHtml(r.name)}</div><div style="font-weight:700">${r.score}/${r.total}</div>`;
+    lbRows.appendChild(row);
+  });
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+
+/* ====== Submit & Finish (auto-save) ====== */
+function submitAndFinish(){
+  // Save score under display name
+  saveToLeaderboard(SETTINGS.name, score, questions.length);
+  // show result (which will load leaderboard)
+  showResult();
+  // small UX: flash Submit -> Saved for clarity
+  nextBtn.textContent = 'Saved ✓';
+  nextBtn.disabled = true;
+  setTimeout(()=> nextBtn.textContent = 'Submit', 1200);
+}
+
+/* ====== Results ====== */
+function showResult(){
+  clearTimer();
+  questionArea.style.display = 'none';
+  resultArea.style.display = 'block';
+  finalScoreEl.textContent = `${score} / ${questions.length}`;
+  const pct = Math.round((score/questions.length)*100);
+  let msg = '';
+if(pct === 100) msg = '10/10! Is that you Javi? 💙';
+  else if(pct >= 80) msg = 'Anti-Sybil Samurai 🤺';
+  else if(pct >= 50) msg = 'Probably a Human 👽';
+  else msg = 'Owner of not_a_bot.eth 🤖';
+  finalFeedback.textContent = msg;
+  quizLink && (quizLink.href = window.location.href);
+  loadLeaderboardDisplay();
+}
+
+/* Share (from results) */
+shareBtnResult.addEventListener('click', ()=>{
+  const text = encodeURIComponent(`Just scored ${score}/${questions.length} on the Billions Quiz and apparently I'm "${finalFeedback.textContent}"
+
+Think you can beat me? Prove you're not a bot and try it yourself 👇
+
+Click here:`);
+  const url = encodeURIComponent(window.location.href);
+  const tweet = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+  window.open(tweet, '_blank');
+});
+
+/* Retake */
+retakeBtn.addEventListener('click', ()=>{
+  startArea.style.display = 'block';
+  questionArea.style.display = 'none';
+  resultArea.style.display = 'none';
+});
+
+/* Keyboard helper */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){
+    if(!nextBtn.disabled && explainBox.style.display !== 'none'){
+      nextBtn.click();
+    }
+  }
+});
+
+startBtn.addEventListener('keydown', (e)=>{ if(e.key==='Enter') startBtn.click(); });
+
+</script>
+</body>
+</html>
